@@ -63,8 +63,6 @@ public:
     void OnReturnToMainMenu();
     void NotifyContextChange();
     void NotifyVehicleChanged(Actor* old_vehicle, Actor* new_vehicle);
-    void ActivateDepthOfFieldEffect();
-    void DisableDepthOfFieldEffect();
 
     void CameraBehaviorOrbitReset();
     bool CameraBehaviorOrbitMouseMoved(const OIS::MouseEvent& _arg);

@@ -35,7 +35,6 @@
 #include "Collisions.h"
 #include "ContentManager.h"
 #include "DashBoardManager.h"
-#include "DepthOfFieldEffect.h"
 #include "DustManager.h"
 #include "EnvironmentMap.h"
 #include "ForceFeedback.h"
@@ -43,7 +42,6 @@
 #include "GUI_TeleportWindow.h"
 #include "GUI_TopMenubar.h"
 #include "GUIManager.h"
-#include "Heathaze.h"
 #include "IWater.h"
 #include "InputEngine.h"
 #include "LandVehicleSimulation.h"
@@ -124,7 +122,6 @@ SimController::SimController(RoR::ForceFeedback* ff, RoR::SkidmarkConfig* skid_c
     m_actor_manager(),
     m_character_factory(),
     m_dir_arrow_pointed(Vector3::ZERO),
-    m_heathaze(nullptr),
     m_force_feedback(ff),
     m_skidmark_conf(skid_conf),
     m_hide_gui(false),
@@ -1714,9 +1711,6 @@ bool SimController::frameStarted(const FrameEvent& evt)
     if (simRUNNING(s) || simPAUSED(s) || simEDITOR(s))
     {
         m_actor_manager.GetParticleManager().update();
-
-        if (m_heathaze)
-            m_heathaze->update();
     }
 
     if ((simRUNNING(s) || simEDITOR(s)) && !simPAUSED(s))
@@ -2164,13 +2158,6 @@ bool SimController::SetupGameplayLoop()
 
     gEnv->player = m_character_factory.createLocal(colourNum);
 
-    // heathaze effect
-    if (App::gfx_enable_heathaze.GetActive())
-    {
-        m_heathaze = new HeatHaze();
-        m_heathaze->setEnable(true);
-    }
-
     if (gEnv->cameraManager == nullptr)
     {
         // init camera manager after mygui and after we have a character
@@ -2280,11 +2267,6 @@ bool SimController::SetupGameplayLoop()
 
     gEnv->sceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
-    if (App::gfx_enable_dof.GetActive())
-    {
-        gEnv->cameraManager->ActivateDepthOfFieldEffect();
-    }
-
     return true;
 }
 
@@ -2357,7 +2339,6 @@ void SimController::EnterGameplayLoop()
     RoRWindowEventUtilities::removeWindowEventListener(App::GetOgreSubsystem()->GetRenderWindow(), this);
     // DO NOT: App::GetSceneMouse()    ->SetSimController(nullptr); -- already deleted via App::DeleteSceneMouse();      // TODO: de-globalize that object!
     // DO NOT: App::GetOverlayWrapper()->SetSimController(nullptr); -- already deleted via App::DestroyOverlayWrapper(); // TODO: de-globalize that object!
-    gEnv->cameraManager->DisableDepthOfFieldEffect(); // TODO: de-globalize the CameraManager
 }
 
 void SimController::SetPlayerActor(Actor* actor)
